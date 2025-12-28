@@ -1,35 +1,41 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import CanvasStage from "./components/CanvasStage"
+import Toolbar from "./components/Toolbar"
+import { useRef, useState } from 'react';
+import { mockPalette } from "./components/Mockpalette";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [imageSrc, setImageSrc] = useState(null);
+  const [cards, setCards] = useState(mockPalette);
+  const stageRef = useRef();
+
+  const handleUpload = (e) => {
+    const file = e.target.files[0];
+    setImageSrc(URL.createObjectURL(file));
+  };
+
+  const handleExport = () => {
+    const uri = stageRef.current.toDataURL({ pixelRatio: 2 });
+    const a = document.createElement("a");
+    a.download = "pantone.png";
+    a.href = uri;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div className = "h-screen flex flex-col">
+      <Toolbar onUpload={handleUpload} onExport={handleExport}/>
+      {imageSrc && (
+        <CanvasStage 
+        ref = {stageRef}
+        imageSrc = {imageSrc}
+        cards = {cards}
+        setCards = {setCards}
+        />
+      )}
+    </div>  
+  );
 }
 
 export default App
