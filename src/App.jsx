@@ -8,8 +8,20 @@ function App() {
   const [cards, setCards] = useState(mockPalette);
   const stageRef = useRef();
 
-  const handleUpload = (e) => {
+  const handleUpload = async (e) => {
     const file = e.target.files[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    const response = await fetch("http://localhost:8000/analyze", {
+      method: "POST",
+      body: formData
+    });
+
+    const data = await response.json();
+    console.log(data);
     setImageSrc(URL.createObjectURL(file));
   };
 
